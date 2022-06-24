@@ -1,10 +1,12 @@
 
+from gettext import find
 import os
 import shutil
-import glob
+import sys
 
-desktop_path = '/Users/productmanager/desktop/'
-dir = os.listdir(desktop_path)
+# Use script with directory to be cleaned as an argument eg. python clean_desk.py /Users/ryanmaloney/desktop/   
+
+dir_path = str(sys.argv[1])
 
 locations = {
     'images': ['png', 'jpg', 'jpeg', 'gif' ],
@@ -13,32 +15,37 @@ locations = {
     'docs': ['pdf', 'docx']
 }
 
-
-png = glob.glob(desktop_path + '*.png')
-pdf = glob.glob(desktop_path + '*.pdf')
-
 def get_extension(filename):
     return filename.rsplit('.', 1)[1]
 
 def find_location(ext):
-    '''Find the desired location based on file type and extension'''
     key = [k for k,v in locations.items() if ext in v]  
-    return key
+    return next(iter(key or []), None)
 
-def move_files():
-    for file in os.listdir(desktop_path):
-        full_path = os.path.join(desktop_path, file)
+def move_files(dir):
+    for file in os.listdir(dir):
+        full_path = os.path.join(dir, file)
 
-        if os.path.isfile(full_path):
-            #check if file or directory
-             if '.' in file:
-                #check if this is a standard filetype
-                desired_folder = find_location(get_extension(file))
+        if file[0] != '.':
+            #ignore hidden files like .env or .DS_Store
+            if os.path.isfile(full_path):
+                print(file)
+                ext = get_extension(file)
+                #check if file or directory
+                if '.' in file:
+                    #check if this is a standard filetype
+                    desired_folder = find_location(ext)
 
-                if len(desired_folder) > 0:
-                    #check if this file is listed in locations
-                    shutil.move(full_path, desktop_path + desired_folder[0])
-
-
+                    if desired_folder:
+                        #if folder doesn't exist, make it and add to desired folder
+                        if os.path.isdir(dir + desired_folder) == False:
+                            os.mkdir(dir + desired_folder)
+                        shutil.move(full_path, dir + desired_folder)
+                    else:
+                        #create a new folder for this filetype
+                        os.mkdir(dir + ext)
+                        locations[ext] = ext
+                        shutil.move(full_path, dir + ext)
+                
 if __name__ == '__main__':
-    move_files()
+    move_files(dir_path)
