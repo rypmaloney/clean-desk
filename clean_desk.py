@@ -1,5 +1,4 @@
-from distutils.command.build_scripts import first_line_re
-from gettext import find, gettext
+
 import os
 import shutil
 import glob
@@ -23,7 +22,7 @@ def get_extension(filename):
 
 def find_location(ext):
     '''Find the desired location based on file type and extension'''
-    key = [k for k,v in locations.items() if ext in v]
+    key = [k for k,v in locations.items() if ext in v]  
     return key
 
 def move_files():
@@ -35,11 +34,10 @@ def move_files():
              if '.' in file:
                 #check if this is a standard filetype
                 desired_folder = find_location(get_extension(file))
+
                 if len(desired_folder) > 0:
                     #check if this file is listed in locations
                     shutil.move(full_path, desktop_path + desired_folder[0])
-
-
 
 
 if __name__ == '__main__':
