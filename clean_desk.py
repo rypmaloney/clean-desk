@@ -11,8 +11,9 @@ dir_path = str(sys.argv[1])
 locations = {
     'images': ['png', 'jpg', 'jpeg', 'gif' ],
     'sheets': ['csv', 'xls'],
-    'notes': ['txt'],
-    'docs': ['pdf', 'docx']
+    'notes': ['txt', 'rtf'],
+    'docs': ['pdf', 'docx'],
+    'downloads': ['zip', 'dmg']
 }
 
 def get_extension(filename):
@@ -33,16 +34,13 @@ def move_files(dir):
                 ext = get_extension(file)
                 #check if file or directory
                 if '.' in file:
-                    #check if this is a standard filetype
                     desired_folder = find_location(ext)
 
                     if desired_folder:
-                        #if folder doesn't exist, make it and add to desired folder
                         if os.path.isdir(dir + desired_folder) == False:
                             os.mkdir(dir + desired_folder)
                         shutil.move(full_path, dir + desired_folder)
                     else:
-                        #create a new folder for this filetype
                         os.mkdir(dir + ext)
                         locations[ext] = ext
                         shutil.move(full_path, dir + ext)
